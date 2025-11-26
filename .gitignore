@@ -1,0 +1,42 @@
+# 依赖
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# 生成的图片文件
+*.png
+*.jpg
+*.jpeg
+
+# 测试文件（保留测试脚本，但忽略生成的图片）
+mindmap*.png
+test_*.png
+docker_test.png
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-*
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 环境变量
+.env
+.env.local
+
+# Vercel（已不使用，但保留以防万一）
+.vercel
+
+# 日志
+*.log
+logs/
+
+# 临时文件
+*.tmp
+*.temp
+.cache/

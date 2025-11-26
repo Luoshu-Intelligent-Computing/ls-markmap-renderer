@@ -1,0 +1,37 @@
+# Node modules
+node_modules
+npm-debug.log
+yarn-error.log
+
+# 生成的图片文件
+*.png
+*.jpg
+*.jpeg
+
+# 测试文件
+test/
+test_api.py
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# 文档
+README.md
+
+# Vercel 相关（不再使用）
+vercel.json
+api/
+
+# 旧的渲染器文件
+markmap_renderer.js
+
+# 临时文件
+*.tmp
+*.log

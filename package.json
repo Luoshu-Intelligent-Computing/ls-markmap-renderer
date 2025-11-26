@@ -1,0 +1,30 @@
+{
+  "name": "markmap-renderer",
+  "version": "2.0.0",
+  "description": "Markmap 图片渲染工具（使用本地文件）",
+  "main": "js/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node js/server.js",
+    "start:dev": "node js/server.js"
+  },
+  "keywords": [
+    "markmap",
+    "mindmap",
+    "render",
+    "png",
+    "api"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "markmap-lib": "^0.18.12",
+    "markmap-view": "^0.18.12",
+    "node-html-to-image": "^3.2.4",
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18.x"
+  }
+}
+
