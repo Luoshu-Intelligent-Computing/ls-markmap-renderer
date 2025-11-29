@@ -153,26 +153,16 @@ docker build -t markmap-renderer .
 
 ### 运行容器
 
-#### 方式一：使用 docker run
+#### 使用 docker run
 
 ```bash
+# 拉取镜像
+docker pull registry.cn-hangzhou.aliyuncs.com/ychy7001/ls-markmap-renderer:latest
+# 启动容器
 docker run -d \
   --name markmap-renderer \
   -p 3000:3000 \
-  markmap-renderer
-```
-
-#### 方式二：使用 docker-compose（推荐）
-
-```bash
-# 启动服务
-docker-compose up -d
-
-# 查看日志
-docker-compose logs -f
-
-# 停止服务
-docker-compose down
+  registry.cn-hangzhou.aliyuncs.com/ychy7001/ls-markmap-renderer:latest
 ```
 
 ### 测试容器
