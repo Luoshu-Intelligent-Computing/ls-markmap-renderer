@@ -1,10 +1,14 @@
 # Markmap 渲染服务
 
-将 Markdown 思维导图渲染为 PNG/JPEG 图片的服务，支持命令行和 HTTP API 两种使用方式。
+将 Markdown 思维导图渲染为 PNG/JPEG 图片的 HTTP API 服务。
+
+## 📚 文档导航
+
+- [工具脚本说明](./scripts/README.md) - Docker 构建、推送和依赖下载脚本
+- [测试说明](./tests/README.md) - API 测试指南
 
 ## 功能特性
 
-- ✅ 命令行工具：本地渲染 Markdown 为图片
 - ✅ RESTful API：HTTP 接口服务，支持远程调用
 - ✅ 支持 PNG/JPEG 格式输出
 - ✅ 支持自定义尺寸和样式
@@ -18,11 +22,9 @@
 npm install
 ```
 
-## 使用方法
+## 快速开始
 
-### 方式一：HTTP API 服务
-
-#### 本地运行
+### 本地运行
 
 ```bash
 # 安装依赖
@@ -78,11 +80,7 @@ GET /api/health
 ```bash
 curl -X POST http://localhost:3000/api/render \
   -H "Content-Type: application/json" \
-  -d '{
-    "markdown": "# 测试标题\n## 分支1\n- 内容1",
-    "width": 2400,
-    "height": 1800
-  }' \
+  -d '{"markdown": "# 测试标题\n## 分支1\n- 内容1"}' \
   --output mindmap.png
 ```
 
@@ -90,49 +88,15 @@ curl -X POST http://localhost:3000/api/render \
 ```python
 import requests
 
-url = "http://localhost:3000/api/render"
-data = {
-    "markdown": "# 测试标题\n## 分支1\n- 内容1",
-    "width": 2400,
-    "height": 1800
-}
+response = requests.post('http://localhost:3000/api/render', json={
+    'markdown': '# 测试标题\n## 分支1\n- 内容1',
+    'width': 2400,
+    'height': 1800
+})
 
-response = requests.post(url, json=data)
 if response.status_code == 200:
-    with open("mindmap.png", "wb") as f:
+    with open('mindmap.png', 'wb') as f:
         f.write(response.content)
-    print("图片已保存")
-else:
-    print(f"错误: {response.json()}")
-```
-
-**JavaScript/Node.js:**
-```javascript
-const fetch = require('node-fetch');
-const fs = require('fs');
-
-async function renderMarkmap() {
-    const response = await fetch('http://localhost:3000/api/render', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            markdown: '# 测试标题\n## 分支1\n- 内容1',
-            width: 2400,
-            height: 1800
-        })
-    });
-
-    if (response.ok) {
-        const buffer = await response.buffer();
-        fs.writeFileSync('mindmap.png', buffer);
-        console.log('图片已保存');
-    } else {
-        const error = await response.json();
-        console.error('错误:', error);
-    }
-}
-
-renderMarkmap();
 ```
 
 #### 健康检查
@@ -148,34 +112,53 @@ GET /api/health
 ### 构建镜像
 
 ```bash
+# 使用脚本构建并推送（推荐）
+./scripts/docker_build_and_push.sh
+
+# 或手动构建
 docker build -t markmap-renderer .
 ```
 
 ### 运行容器
 
-#### 使用 docker run
-
 ```bash
-# 拉取镜像
-docker pull registry.cn-hangzhou.aliyuncs.com/ychy7001/ls-markmap-renderer:latest
-# 启动容器
+# 拉取并运行
 docker run -d \
   --name markmap-renderer \
   -p 3000:3000 \
   registry.cn-hangzhou.aliyuncs.com/ychy7001/ls-markmap-renderer:latest
+
+# 测试
+curl http://localhost:3000/api/health
 ```
 
-### 测试容器
+> 📖 更多 Docker 相关说明，请查看 [scripts/README.md](./scripts/README.md)
 
-容器启动后，可以通过以下方式测试：
+## 🧪 测试
+
+### 快速测试
 
 ```bash
-# 健康检查
-curl http://localhost:3000/api/health
+# 1. 启动服务器
+npm start &
 
-# 使用测试脚本（需要修改端口或使用容器 IP）
-python test_api.py
+# 2. 等待启动（约 3 秒）
+sleep 3
+
+# 3. 运行 API 测试
+python tests/test_api.py
+
+# 4. 停止服务器
+pkill -f "node js/server.js"
 ```
+
+### 健康检查
+
+```bash
+curl http://localhost:3000/api/health
+```
+
+> 📖 更多测试说明，请查看 [tests/README.md](./tests/README.md)
 
 ### 环境变量
 

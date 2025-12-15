@@ -8,9 +8,9 @@ yarn-error.log
 *.jpg
 *.jpeg
 
-# 测试文件
-test/
-test_api.py
+# 测试文件和数据
+tests/
+data/
 
 # Git
 .git

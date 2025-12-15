@@ -1,10 +1,15 @@
 #!/bin/bash
 # 下载 markmap 文件脚本
+# 下载 markmap 相关 JS 文件到 js/ 目录（运行时使用）
 
-MARKMAP_DIR="$(dirname "$0")"
-cd "$MARKMAP_DIR" || exit 1
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+JS_DIR="$PROJECT_ROOT/js"
 
-echo "正在下载 markmap 文件到: $MARKMAP_DIR"
+cd "$JS_DIR" || exit 1
+
+echo "正在下载 markmap 文件到: $JS_DIR"
+echo ""
 
 # 下载 markmap-lib.js
 echo "下载 markmap-lib.js..."

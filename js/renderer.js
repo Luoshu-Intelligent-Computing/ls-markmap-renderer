@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const { Transformer } = require('markmap-lib');
 const nodeHtmlToImage = require('node-html-to-image');
+const config = require('./config');
 
 /**
  * 渲染 Markdown 为思维导图图片
@@ -19,20 +20,15 @@ const nodeHtmlToImage = require('node-html-to-image');
  */
 async function renderMarkmap(markdown, outputPath, options = {}) {
     const {
-        width = 2400,
-        height = 1800,
-        format = 'png',
+        width = config.DEFAULT_WIDTH,
+        height = config.DEFAULT_HEIGHT,
+        format = config.DEFAULT_FORMAT,
         jsonOptions = {
             duration: 0,
             maxInitialScale: 5,
             color: (node) => {
-                // 使用丰富的颜色方案
-                const colorPalette = [
-                    '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
-                    '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
-                    '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5',
-                    '#c49c94', '#f7b6d3', '#c7c7c7', '#dbdb8d', '#9edae5'
-                ];
+                // 使用配置的颜色方案
+                const colorPalette = config.COLOR_PALETTE;
                 try {
                     if (node.state && node.state.path) {
                         const pathParts = node.state.path.split('.');
@@ -45,7 +41,8 @@ async function renderMarkmap(markdown, outputPath, options = {}) {
                         return colorPalette[hash % colorPalette.length];
                     }
                 } catch (e) {
-                    // 忽略错误
+                    // 记录错误但不中断渲染，使用默认颜色
+                    console.warn('颜色计算错误，使用默认颜色:', e.message);
                 }
                 return colorPalette[(node.depth || 0) % colorPalette.length];
             },
@@ -219,29 +216,22 @@ async function renderMarkmap(markdown, outputPath, options = {}) {
 
         // 渲染为图片
         console.log('开始渲染图片...');
-        // 检测系统 Chromium 路径（Docker 容器中使用系统 Chromium）
-        const chromiumPath = process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium';
         
         const image = await nodeHtmlToImage({
             html,
             type: format,
             puppeteerArgs: {
-                executablePath: chromiumPath,
-                args: [
-                    '--no-sandbox', 
-                    '--disable-setuid-sandbox', 
-                    '--disable-dev-shm-usage',
-                    '--disable-gpu',
-                    '--disable-software-rasterizer',
-                    '--font-render-hinting=none'
-                ],
-                timeout: 120000  // 120秒超时
+                executablePath: config.PUPPETEER_EXECUTABLE_PATH,
+                args: config.PUPPETEER_ARGS,
+                timeout: config.RENDER_TIMEOUT
             },
             waitUntil: 'load',  // 改为 load，避免等待网络请求
-            timeout: 120000,
+            timeout: config.RENDER_TIMEOUT,
             beforeScreenshot: async (page) => {
                 // 等待渲染完成标志
-                await page.waitForFunction(() => window.renderComplete === true, { timeout: 30000 });
+                await page.waitForFunction(() => window.renderComplete === true, { 
+                    timeout: config.RENDER_CHECK_TIMEOUT 
+                });
                 // 额外等待确保所有动画和渲染完成
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 // 等待字体加载完成

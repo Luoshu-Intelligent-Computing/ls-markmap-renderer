@@ -13,6 +13,11 @@ package-lock.json
 mindmap*.png
 test_*.png
 docker_test.png
+tests/test_output/
+data/mindmap.png
+data/*.png
+data/*.jpeg
+data/*.jpg
 
 # IDE
 .vscode/
@@ -29,7 +34,7 @@ Thumbs.db
 .env
 .env.local
 
-# Vercel（已不使用，但保留以防万一）
+# Vercel（已清理，不再使用）
 .vercel
 
 # 日志

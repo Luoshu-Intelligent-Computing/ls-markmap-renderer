@@ -1,10 +1,36 @@
 import requests
 import sys
 import time
+from pathlib import Path
 
 # 配置
 API_URL = "http://localhost:3000/api/render"
 HEALTH_URL = "http://localhost:3000/api/health"
+
+# 测试数据（内嵌在代码中）
+TEST_MARKDOWN = """# 测试思维导图
+
+## 第一部分：基础概念
+- 概念A
+  - 子概念A1
+  - 子概念A2
+- 概念B
+  - 子概念B1
+  - 子概念B2
+
+## 第二部分：高级功能
+- 功能1
+  - 特性1.1
+  - 特性1.2
+- 功能2
+  - 特性2.1
+  - 特性2.2
+
+## 第三部分：应用场景
+- 场景A
+- 场景B
+- 场景C
+"""
 
 def check_server():
     """检查服务器是否运行"""
@@ -30,7 +56,7 @@ def check_server():
 def test_render():
     """测试渲染功能"""
     data = {
-        "markdown": "# 测试标题\n## 分支1\n- 内容1\n- 内容2\n## 分支2\n- 内容3",
+        "markdown": TEST_MARKDOWN,
         "width": 1920,
         "height": 1080,
         "format": "png"
@@ -49,7 +75,13 @@ def test_render():
         elapsed_time = time.time() - start_time
         
         if response.status_code == 200:
-            output_file = "mindmap.png"
+            # 确保 data 目录存在
+            project_root = Path(__file__).parent.parent
+            data_dir = project_root / "data"
+            data_dir.mkdir(exist_ok=True)
+            
+            # 保存到 data 目录
+            output_file = data_dir / "mindmap.png"
             with open(output_file, "wb") as f:
                 f.write(response.content)
             file_size = len(response.content)
