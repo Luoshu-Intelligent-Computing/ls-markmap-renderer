@@ -101,12 +101,175 @@ app.post('/api/render', async (req, res) => {
     }
 });
 
+// ==================== MCP 端点 ====================
+
+// MCP 工具发现端点
+app.get('/mcp/discover', (req, res) => {
+    res.json({
+        name: 'markmap',
+        version: '1.0.0',
+        description: 'Markmap 渲染服务 - 将 Markdown 思维导图渲染为图片',
+        tools: [
+            {
+                name: 'render_markmap',
+                description: '渲染 Markdown 思维导图为图片',
+                parameters: [
+                    {
+                        name: 'markdown',
+                        type: 'string',
+                        description: 'Markdown 格式的思维导图内容',
+                        required: true
+                    },
+                    {
+                        name: 'width',
+                        type: 'number',
+                        description: '图片宽度（像素），默认 1920',
+                        required: false,
+                        default: 1920
+                    },
+                    {
+                        name: 'height',
+                        type: 'number',
+                        description: '图片高度（像素），默认 1080',
+                        required: false,
+                        default: 1080
+                    },
+                    {
+                        name: 'format',
+                        type: 'string',
+                        description: '图片格式，可选值：png, jpeg，默认 png',
+                        required: false,
+                        default: 'png'
+                    }
+                ]
+            }
+        ]
+    });
+});
+
+// MCP 工具调用端点
+app.post('/mcp/call', async (req, res) => {
+    try {
+        const { tool, arguments: args } = req.body;
+        
+        // 验证工具名称
+        if (tool !== 'render_markmap') {
+            return res.status(400).json({
+                success: false,
+                error: `未知的工具: ${tool}`,
+                data: null
+            });
+        }
+        
+        // 参数验证
+        if (!args || !args.markdown) {
+            return res.status(400).json({
+                success: false,
+                error: '参数验证失败: markdown 参数不能为空',
+                data: null
+            });
+        }
+        
+        const width = args.width || 1920;
+        const height = args.height || 1080;
+        const format = args.format || 'png';
+        
+        // 验证参数值
+        if (width <= 0 || height <= 0) {
+            return res.status(400).json({
+                success: false,
+                error: '参数验证失败: width 和 height 必须大于 0',
+                data: null
+            });
+        }
+        
+        if (!['png', 'jpeg'].includes(format)) {
+            return res.status(400).json({
+                success: false,
+                error: '参数验证失败: format 必须是 png 或 jpeg',
+                data: null
+            });
+        }
+        
+        // 验证 markdown 长度
+        if (args.markdown.length > config.MAX_MARKDOWN_LENGTH) {
+            return res.status(400).json({
+                success: false,
+                error: `参数验证失败: markdown 内容超过最大长度 ${config.MAX_MARKDOWN_LENGTH} 字节`,
+                data: null
+            });
+        }
+        
+        // 验证 width 和 height 范围
+        const widthNum = parseInt(width);
+        const heightNum = parseInt(height);
+        if (isNaN(widthNum) || widthNum < config.MIN_WIDTH || widthNum > config.MAX_WIDTH) {
+            return res.status(400).json({
+                success: false,
+                error: `参数验证失败: width 必须在 ${config.MIN_WIDTH} 和 ${config.MAX_WIDTH} 之间`,
+                data: null
+            });
+        }
+        if (isNaN(heightNum) || heightNum < config.MIN_HEIGHT || heightNum > config.MAX_HEIGHT) {
+            return res.status(400).json({
+                success: false,
+                error: `参数验证失败: height 必须在 ${config.MIN_HEIGHT} 和 ${config.MAX_HEIGHT} 之间`,
+                data: null
+            });
+        }
+        
+        console.log(`[MCP] 收到渲染请求: ${widthNum}x${heightNum}, 格式: ${format}`);
+        
+        // 调用渲染函数
+        const imageBuffer = await renderMarkmap(args.markdown, null, { 
+            width: widthNum, 
+            height: heightNum,
+            format: format
+        });
+        
+        // 转换为 Base64
+        const imageBase64 = imageBuffer.toString('base64');
+        
+        console.log(`[MCP] 渲染完成，图片大小: ${imageBuffer.length} 字节`);
+        
+        res.json({
+            success: true,
+            data: {
+                image: imageBase64
+            },
+            metadata: {
+                width: widthNum,
+                height: heightNum,
+                format: format,
+                size_bytes: imageBuffer.length
+            }
+        });
+    } catch (error) {
+        console.error('[MCP] 渲染失败:', error);
+        res.status(500).json({
+            success: false,
+            error: `渲染失败: ${error.message}`,
+            data: null
+        });
+    }
+});
+
+// MCP 健康检查端点
+app.get('/mcp/health', (req, res) => {
+    res.json({ status: 'ok' });
+});
+
+// ==================== 原有端点 ====================
+
 // 启动服务器
 const server = app.listen(PORT, () => {
     console.log(`✓ Markmap 渲染服务已启动`);
     console.log(`  访问地址: http://localhost:${PORT}`);
     console.log(`  健康检查: http://localhost:${PORT}/api/health`);
     console.log(`  渲染 API: http://localhost:${PORT}/api/render`);
+    console.log(`  MCP 发现: http://localhost:${PORT}/mcp/discover`);
+    console.log(`  MCP 调用: http://localhost:${PORT}/mcp/call`);
+    console.log(`  MCP 健康: http://localhost:${PORT}/mcp/health`);
 });
 
 // 处理端口占用错误
