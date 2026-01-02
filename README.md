@@ -126,7 +126,7 @@ docker build -t markmap-renderer .
 docker run -d \
   --name markmap-renderer \
   -p 3000:3000 \
-  registry.cn-hangzhou.aliyuncs.com/ychy7001/ls-markmap-renderer:latest
+  registry.cn-hangzhou.aliyuncs.com/ychy7001/markmap-renderer:latest
 
 # 测试
 curl http://localhost:3000/api/health

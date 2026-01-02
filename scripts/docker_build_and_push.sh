@@ -24,7 +24,7 @@ set -e
 # 配置变量
 REGISTRY="registry.cn-hangzhou.aliyuncs.com"
 USERNAME="ychy7001"
-IMAGE_NAME="ls-markmap-renderer"
+IMAGE_NAME="markmap-renderer"
 
 # 判断是否提供了版本参数（第一个参数且不是 latest）
 if [ -n "$1" ] && [ "$1" != "latest" ]; then

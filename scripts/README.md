@@ -44,7 +44,7 @@ DOCKER_PASSWORD=mypassword ./scripts/docker_build_and_push.sh 1.0.0
 ```bash
 REGISTRY="registry.cn-hangzhou.aliyuncs.com"  # 镜像仓库地址
 USERNAME="ychy7001"                           # 用户名
-IMAGE_NAME="ls-markmap-renderer"              # 镜像名称
+IMAGE_NAME="markmap-renderer"              # 镜像名称
 ```
 
 #### 注意事项
@@ -60,9 +60,9 @@ IMAGE_NAME="ls-markmap-renderer"              # 镜像名称
 ==========================================
 Docker 镜像构建和推送
 ==========================================
-镜像名称: ls-markmap-renderer
+镜像名称: markmap-renderer
 版本: 1.0.0
-完整地址: registry.cn-hangzhou.aliyuncs.com/ychy7001/ls-markmap-renderer:1.0.0
+完整地址: registry.cn-hangzhou.aliyuncs.com/ychy7001/markmap-renderer:1.0.0
 
 1. 构建 Docker 镜像（使用 BuildKit）...
 ✅ 镜像构建成功
@@ -162,12 +162,12 @@ npm start
 ./scripts/docker_build_and_push.sh 1.0.0
 
 # 2. 在服务器上拉取镜像
-docker pull registry.cn-hangzhou.aliyuncs.com/ychy7001/ls-markmap-renderer:1.0.0
+docker pull registry.cn-hangzhou.aliyuncs.com/ychy7001/markmap-renderer:1.0.0
 
 # 3. 运行容器
 docker run -d -p 3000:3000 \
   --name markmap-renderer \
-  registry.cn-hangzhou.aliyuncs.com/ychy7001/ls-markmap-renderer:1.0.0
+  registry.cn-hangzhou.aliyuncs.com/ychy7001/markmap-renderer:1.0.0
 ```
 
 ## 🐛 故障排除
